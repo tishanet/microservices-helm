@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-cart
+  namespace: default
+  labels:
+    app: redis-cart
+spec:
+  selector:
+    matchLabels:
+      app: redis-cart
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: redis-cart
+    spec:
+      containers:
+        - name: redis-cart
+          image: redis:alpine
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          ports:
+            - containerPort: 6379
+              name: redis-cart
+          volumeMounts:
+            - name: redis-data
+              mountPath: /data
+      restartPolicy: Always
+      volumes:
+        - name: redis-data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-cart
+  namespace: default
+spec:
+  selector:
+    app: redis-cart
+  type: ClusterIP
+  ports:
+    - name: redis-cart
+      protocol: TCP
+      port: 6379
+      targetPort: 6379

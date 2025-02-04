@@ -1,0 +1,19 @@
+appName: emailservice
+appImage: gcr.io/google-samples/microservices-demo/emailservice
+appVersion: "sha256:86cfe447a4a12770fceb64b2157af9b203b4d99bc03ad27fb26628577cba51a1"
+appReplicas: 2
+containerPort: 8080
+containerEnvVar:
+  - name: PORT
+    value: "8080"
+  - name: GOOGLE_CLOUD_PROJECT
+    value: "my-kubernetes-project"
+  - name: DISABLE_TRACING
+    value: "1"
+  - name: DISABLE_PROFILER
+    value: "1"
+  - name: DISABLE_DEBUGGER
+    value: "1"
+
+serviceType: ClusterIP
+servicePort: 8080

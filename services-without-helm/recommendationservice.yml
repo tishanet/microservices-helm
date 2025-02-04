@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recommendationservice
+  namespace: default
+  labels:
+    app: recommendationservice
+spec:
+  selector:
+    matchLabels:
+      app: recommendationservice
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: recommendationservice
+    spec:
+      containers:
+        - name: recommendationservice
+          image: gcr.io/google-samples/microservices-demo/recommendationservice@sha256:a98960bf29d74fa3da54762321f2b058c1ac9dabe07ade815d15dbbcecec7b60
+          resources:
+            limits:
+              cpu: 200m
+              memory: 200Mi
+          env:
+            - name: PORT
+              value: "8080"
+            - name: PRODUCT_CATALOG_SERVICE_ADDR
+              value: "productcatalogservice:3550"
+            - name: GOOGLE_CLOUD_PROJECT
+              value: "my-kubernetes-project"
+            - name: DISABLE_TRACING
+              value: "1"
+            - name: DISABLE_PROFILER
+              value: "1"
+            - name: DISABLE_DEBUGGER
+              value: "1"
+          ports:
+            - containerPort: 8080
+              name: recommservice
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: recommendationservice
+  namespace: default
+spec:
+  selector:
+    app: recommendationservice
+  type: ClusterIP
+  ports:
+    - name: recommendationservice
+      protocol: TCP
+      port: 8080
+      targetPort: 8080

@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.appName }} 
+  namespace: default
+  labels:
+    app: {{ .Values.appName }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.appName }}
+  replicas: {{ .Values.appReplicas }}  
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.appName }}
+    spec:
+      containers:
+        - name: {{ .Values.appName }}
+          image: "{{ .Values.appImage }}:{{ .Values.appVersion }}" 
+          resources:
+            limits:
+              cpu: {{ .Values.containerCPU }} 
+              memory: {{ .Values.containerMemory }} 
+          ports:
+            - containerPort: {{ .Values.containerPort }} 
+              name: {{ .Values.appName }}
+          volumeMounts:
+            - name: {{ .Values.volumeName }}
+              mountPath: {{ .Values.containerMountPath }} 
+      restartPolicy: Always
+      volumes:
+        - name: {{ .Values.volumeName }}
+          emptyDir: {}

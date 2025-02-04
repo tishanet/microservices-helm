@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checkoutservice
+  namespace: default
+  labels:
+    app: checkoutservice
+spec:
+  selector:
+    matchLabels:
+      app: checkoutservice
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: checkoutservice
+    spec:
+      containers:
+        - name: checkoutservice
+          image: gcr.io/google-samples/microservices-demo/checkoutservice@sha256:c4233881c64ceb6daccf16c5b1d30fab6af85e94a2057fa3423baad6328ba13d
+          resources:
+            limits:
+              cpu: 200m
+              memory: 200Mi
+          env:
+            - name: PORT
+              value: "5050"
+            - name: EMAIL_SERVICE_ADDR
+              value: "emailservice:8080"
+            - name: PAYMENT_SERVICE_ADDR
+              value: "paymentservice:50051"
+            - name: SHIPPING_SERVICE_ADDR
+              value: "shippingservice:50051"
+            - name: CURRENCY_SERVICE_ADDR
+              value: "currencyservice:7000"
+            - name: PRODUCT_CATALOG_SERVICE_ADDR
+              value: "productcatalogservice:3550"
+            - name: CART_SERVICE_ADDR
+              value: "cartservice:7070"
+            - name: GOOGLE_CLOUD_PROJECT
+              value: "my-kubernetes-project"
+            - name: DISABLE_TRACING
+              value: "1"
+            - name: DISABLE_PROFILER
+              value: "1"
+            - name: DISABLE_DEBUGGER
+              value: "1"
+          ports:
+            - containerPort: 5050
+              name: checkoutservice
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: checkoutservice
+  namespace: default
+spec:
+  selector:
+    app: checkoutservice
+  type: ClusterIP
+  ports:
+    - name: checkoutservice
+      protocol: TCP
+      port: 5050
+      targetPort: 5050

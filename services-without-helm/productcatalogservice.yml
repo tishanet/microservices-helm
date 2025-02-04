@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: productcatalogservice
+  namespace: default
+  labels:
+    app: productcatalogservice
+spec:
+  selector:
+    matchLabels:
+      app: productcatalogservice
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: productcatalogservice
+    spec:
+      containers:
+        - name: productcatalogservice
+          image: gcr.io/google-samples/microservices-demo/productcatalogservice@sha256:1ad7e6cd79d20e33dc5eed61c80f9cac3e6cf7e31f449902c5fdffe4066166a1
+          resources:
+            limits:
+              cpu: 200m
+              memory: 200Mi
+          env:
+            - name: PORT
+              value: "3550"
+            - name: DISABLE_TRACING
+              value: "1"
+            - name: DISABLE_PROFILER
+              value: "1"
+            - name: DISABLE_DEBUGGER
+              value: "1"
+          ports:
+            - containerPort: 3550
+              name: productservice
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: productcatalogservice
+  namespace: default
+spec:
+  selector:
+    app: productcatalogservice
+  type: ClusterIP
+  ports:
+    - name: productcatalogservice
+      protocol: TCP
+      port: 3550
+      targetPort: 3550
